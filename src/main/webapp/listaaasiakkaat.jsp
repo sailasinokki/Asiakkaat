@@ -13,7 +13,7 @@
 <table id="listaus">
 	<thead>		
 	<tr>
-	<th colspan="6" class="oikealle"> <span id="uusiAsiakas">Lis‰‰ uusi asiakas</span></th>
+	<th colspan="7" class="oikealle"> <span id="uusiAsiakas">Lis‰‰ uusi asiakas</span></th>
 	</tr>
 	<tr>
 	<th class="oikealle">Hakusana:</th>
@@ -62,7 +62,8 @@ $.ajax({url:"asiakkaat/"+$("#hakusana").val(), type:"GET", dataType:"json", succ
     	htmlStr+="<td>"+field.sukunimi+"</td>";
     	htmlStr+="<td>"+field.puhelin+"</td>";  
     	htmlStr+="<td>"+field.sposti+"</td>"; 
-    	htmlStr+="<td><span class='poista' onclick=poista('"+field.asiakas_id+"')>Poista</span></td>";
+    	htmlStr+="<td><a href='muutaasiakas.jsp?asiakas_id="+field.asiakas_id+"'>Muuta</a>&nbsp;"; 
+    	htmlStr+="<span class='poista' onclick=poista('"+field.asiakas_id+"')>Poista</span></td>";
     	htmlStr+="</tr>";
     	$("#listaus tbody").append(htmlStr);
     });	

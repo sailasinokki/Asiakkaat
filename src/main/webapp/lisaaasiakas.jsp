@@ -12,13 +12,13 @@
 <link rel="stylesheet" type="text/css" href="css/main.css">
 <title>Lisaa asiakas</title>
 </head>
-<body>
+<body onkeydown="tutkiKey(event)">
 	<form id="tiedot">
 		<table>
 			<thead>
 				<tr>
-					<th colspan="5" class="oikealle"><span id="takaisin">Takaisin
-							listaukseen</span></th>
+					<th colspan="5" class="oikealle" id= "ilmo"><a href="listaaasiakkaat.jsp" id="takaisin">Takaisin listaukseen</a></th>
+							
 				</tr>
 				<tr>
 					<th>Etunimi</th>
@@ -34,7 +34,7 @@
 					<td><input type="text" name="sukunimi" id="sukunimi"></td>
 					<td><input type="text" name="puhelin" id="puhelin"></td>
 					<td><input type="text" name="sposti" id="sposti"></td>
-					<td><input type="submit" id="tallenna" value="Lisaa"></td>
+					<td><input type="button" name="nappi" id="tallenna" value="Lisää" onclick="lisaaTiedot()"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -42,69 +42,56 @@
 	<span id="ilmo"></span>
 </body>
 <script>
-$(document).ready(function() {
-	$("#takaisin").click(function(){
-		document.location="listaaasiakkaat.jsp";
-	});
-		$("#tiedot").validate({						
-			rules: {
-				etunimi:  {
-					required: true,
-					minlength: 3				
-				},
-				sukunimi:  {
-					required: true,
-					minlength: 3
-				},	
-				puhelin:  {
-					required: true,
-					minlength: 5,
-				},	
-				sposti:  {
-					required: true,
-					minlength: 4,
-							
-				
-				}	
-			},
-	messages: {
-		etunimi: {
-			required: "Puuttuu",
-			number: "Ei kelpaa",
-			minlength: "Liian lyhyt"
-		},
-		sukunimi: {
-			required: "Puuttuu",
-			number: "Ei kelpaa",
-			minlength: "Liian lyhyt"
-		},
-		puhelin: {
-			required: "Puuttuu",
-			minlength: "Liian lyhyt"
-			
-		},
-		sposti: {
-			required: "Puuttuu",
-			minlength: "Liian lyhyt"
-		}
-	},			
-	submitHandler: function(form) {	
+function tutkiKey(event){
+	if(event.keyCode==13){
 		lisaaTiedot();
-		}		
-	}); 	
+	}
+	
+}
 
-}) ;
+document.getElementById("etunimi").focus();
+
 
 function lisaaTiedot(){	
-	var formJsonStr = formDataJsonStr($("#tiedot").serializeArray()); 
-	$.ajax({url:"asiakkaat", data:formJsonStr, type:"POST", dataType:"json", success:function(result) {      
-		if(result.response==0){
-      	$("#ilmo").html("Asiakkaan lisääminen epäonnistui.");
-      }else if(result.response==1){			
-      	$("#ilmo").html("Asiakkaan lisääminen onnistui.");
-      	$("asiakas_id","#etunimi", "#sukunimi", "#puhelin", "#sposti").val("");
+	var ilmo="";
+	
+	if(document.getElementById("etunimi").value.length<2){
+		ilmo="Nimi ei kelpaa!";		
+	}else if(document.getElementById("sukunimi").value.length<2){
+		ilmo="Nimi ei kelpaa!";		
+	}else if(document.getElementById("puhelin").value.length<5){
+		ilmo="Puhelin ei kelpaa!";		
+	}else if(document.getElementById("sposti").value.length<4){
+		ilmo="sposti ei kelpaa!";		
+	}
+	if(ilmo!=""){
+		document.getElementById("ilmo").innerHTML=ilmo;
+		setTimeout(function(){ document.getElementById("ilmo").innerHTML=""; }, 3000);
+		return;
+	}
+	document.getElementById("etunimi").value=siivoa(document.getElementById("etunimi").value);
+	document.getElementById("sukunimi").value=siivoa(document.getElementById("sukunimi").value);
+	document.getElementById("puhelin").value=siivoa(document.getElementById("puhelin").value);
+	document.getElementById("sposti").value=siivoa(document.getElementById("sposti").value);	
+		
+	var formJsonStr=formDataToJSON(document.getElementById("tiedot"));
+	fetch("asiakkaat",{
+	      method: 'POST',
+	      body:formJsonStr
+	    })
+	.then( function (response) {	
+		return response.json()
+	})
+	.then( function (responseJson) {
+		var vastaus = responseJson.response;		
+		if(vastaus==0){
+			document.getElementById("ilmo").innerHTML= "Asiakkaan lisääminen epäonnistui";
+      	}else if(vastaus==1){	        	
+      		document.getElementById("ilmo").innerHTML= "Asiakkaan lisääminen onnistui";			      	
 		}
-  }});	
+		setTimeout(function(){ document.getElementById("ilmo").innerHTML=""; }, 5000);
+	});	
+	document.getElementById("tiedot").reset(); 
 }
 </script>
 </html>
